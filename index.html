@@ -89,14 +89,14 @@
     </div>
 
     <script>
-        // API Guerilla Mail — stable, sans clé API, CORS totalement ouvert
-        const API_BASE = 'https://api.guerrillamail.com/ajax.php';
+        // API TempMailPortal — gratuite, sans clé, CORS activé
+        const API_BASE = 'https://api.tempmailportal.com';
         let currentEmail = null;
-        let currentSidToken = null;
+        let currentToken = null;
 
         window.addEventListener('DOMContentLoaded', async () => {
             await generateNewEmail();
-            setInterval(loadMessages, 10000); // Auto-refresh toutes les 10s
+            setInterval(loadMessages, 10000);
         });
 
         function showError(msg) {
@@ -111,12 +111,12 @@
             document.getElementById('emailDisplay').textContent = 'Chargement...';
             
             try {
-                const res = await fetch(`${API_BASE}?f=get_email_address&lang=fr`);
+                const res = await fetch(`${API_BASE}/api/inbox`, { method: 'POST' });
                 if (!res.ok) throw new Error('API injoignable');
                 const data = await res.json();
                 
-                currentEmail = data.email_addr;
-                currentSidToken = data.sid_token;
+                currentEmail = data.address;
+                currentToken = data.token;
 
                 document.getElementById('emailDisplay').textContent = currentEmail;
                 document.getElementById('emailList').innerHTML = `
@@ -147,12 +147,14 @@
         }
 
         async function loadMessages() {
-            if (!currentSidToken) return;
+            if (!currentToken) return;
             try {
-                const res = await fetch(`${API_BASE}?f=check_email&seq=0&sid_token=${currentSidToken}`);
+                const res = await fetch(`${API_BASE}/api/messages`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
                 if (!res.ok) return;
-                const data = await res.json();
-                renderMessages(data.list || []);
+                const messages = await res.json();
+                renderMessages(messages);
             } catch (error) {
                 console.error('Erreur chargement:', error);
             }
@@ -169,27 +171,28 @@
                 return;
             }
             list.innerHTML = messages.map(msg => `
-                <div class="email-item" onclick="openMessage('${msg.mail_id}')">
-                    <div class="email-from">De : ${escapeHtml(msg.mail_from)}</div>
-                    <div class="email-subject">${escapeHtml(msg.mail_subject || '(Sans sujet)')}</div>
-                    <div class="email-date">${escapeHtml(msg.mail_date)}</div>
+                <div class="email-item" onclick="openMessage('${msg.id}')">
+                    <div class="email-from">De : ${escapeHtml(msg.from || 'Inconnu')}</div>
+                    <div class="email-subject">${escapeHtml(msg.subject || '(Sans sujet)')}</div>
+                    <div class="email-date">${escapeHtml(msg.createdAt || msg.date)}</div>
                 </div>
             `).join('');
         }
 
         async function openMessage(id) {
             try {
-                const res = await fetch(`${API_BASE}?f=fetch_email&email_id=${id}&sid_token=${currentSidToken}`);
+                const res = await fetch(`${API_BASE}/api/messages/${id}`, {
+                    headers: { 'Authorization': `Bearer ${currentToken}` }
+                });
                 if (!res.ok) throw new Error('Erreur de lecture');
                 const msg = await res.json();
 
-                document.getElementById('modalSubject').textContent = msg.mail_subject || '(Sans sujet)';
+                document.getElementById('modalSubject').textContent = msg.subject || '(Sans sujet)';
                 document.getElementById('modalMeta').innerHTML = `
-                    <strong>De :</strong> ${escapeHtml(msg.mail_from)}<br>
-                    <strong>Date :</strong> ${escapeHtml(msg.mail_date)}
+                    <strong>De :</strong> ${escapeHtml(msg.from || 'Inconnu')}<br>
+                    <strong>Date :</strong> ${escapeHtml(msg.createdAt || msg.date)}
                 `;
-                // Guerilla Mail renvoie le corps en HTML
-                document.getElementById('modalBody').innerHTML = msg.mail_body || '<em>Message vide</em>';
+                document.getElementById('modalBody').innerHTML = msg.html || msg.text || '(Message vide)';
                 document.getElementById('modal').classList.add('active');
             } catch (error) {
                 console.error('Erreur:', error);
