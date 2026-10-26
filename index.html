@@ -1,1 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TempMailGo — Email Temporaire Gratuit</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; }
+        header { text-align: center; color: white; margin-bottom: 30px; }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        header p { opacity: 0.9; font-size: 1.1em; }
+        .card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2); margin-bottom: 20px; }
+        .email-box { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .email-display { flex: 1; background: #f0f4ff; padding: 15px 20px; border-radius: 10px; font-size: 1.2em; font-weight: 600; color: #4a5568; border: 2px dashed #667eea; word-break: break-all; min-width: 250px; }
+        .btn { padding: 15px 25px; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s; color: white; }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
+        .btn-secondary { background: #48bb78; }
+        .btn-secondary:hover { background: #38a169; transform: translateY(-2px); }
+        .btn-small { padding: 8px 15px; font-size: 0.85em; }
+        .inbox-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .inbox-header h2 { color: #2d3748; }
+        .email-list { display: flex; flex-direction: column; gap: 10px; }
+        .email-item { padding: 15px; background: #f7fafc; border-radius: 10px; border-left: 4px solid #667eea; cursor: pointer; transition: all 0.2s; }
+        .email-item:hover { background: #edf2f7; transform: translateX(5px); }
+        .email-from { font-weight: 600; color: #2d3748; margin-bottom: 5px; }
+        .email-subject { color: #4a5568; margin-bottom: 5px; }
+        .email-date { font-size: 0.85em; color: #a0aec0; }
+        .empty-state { text-align: center; padding: 40px; color: #a0aec0; }
+        .empty-state .icon { font-size: 3em; margin-bottom: 10px; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 15px; padding: 30px; max-width: 700px; width: 100%; max-height: 80vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; gap: 15px; }
+        .modal-header h3 { color: #2d3748; word-break: break-word; }
+        .close-btn { background: #f56565; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2em; flex-shrink: 0; }
+        .modal-body { color: #4a5568; line-height: 1.6; word-break: break-word; }
+        .modal-meta { font-size: 0.9em; color: #718096; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+        .toast { position: fixed; bottom: 30px; right: 30px; background: #2d3748; color: white; padding: 15px 25px; border-radius: 10px; z-index: 2000; animation: slideIn 0.3s; max-width: 300px; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .loading { text-align: center; padding: 30px; color: #667eea; }
+        .spinner { border: 3px solid #f0f4ff; border-top: 3px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .error-box { background: #fed7d7; color: #c53030; padding: 15px; border-radius: 10px; margin-top: 10px; font-size: 0.9em; }
+        @media (max-width: 600px) { header h1 { font-size: 1.8em; } .email-display { font-size: 1em; padding: 12px; } .btn { padding: 12px 18px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📧 TempMailGo</h1>
+            <p>Générateur d'adresses email temporaires</p>
+        </header>
 
+        <div class="card">
+            <div class="email-box">
+                <div class="email-display" id="emailDisplay">Chargement...</div>
+                <button class="btn btn-primary" onclick="copyEmail()">📋 Copier</button>
+                <button class="btn btn-secondary" onclick="generateNewEmail()">🔄 Nouveau</button>
+            </div>
+            <div id="errorMsg"></div>
+        </div>
+
+        <div class="card">
+            <div class="inbox-header">
+                <h2>📥 Boîte de réception</h2>
+                <button class="btn btn-primary btn-small" onclick="loadMessages()">🔄 Actualiser</button>
+            </div>
+            <div id="emailList" class="email-list">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Chargement des messages...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalSubject"></h3>
+                <button class="close-btn" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-meta" id="modalMeta"></div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // API Guerilla Mail — stable, sans clé API, CORS totalement ouvert
+        const API_BASE = 'https://api.guerrillamail.com/ajax.php';
+        let currentEmail = null;
+        let currentSidToken = null;
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await generateNewEmail();
+            setInterval(loadMessages, 10000); // Auto-refresh toutes les 10s
+        });
+
+        function showError(msg) {
+            document.getElementById('errorMsg').innerHTML = `<div class="error-box">⚠️ ${msg}</div>`;
+        }
+        function clearError() {
+            document.getElementById('errorMsg').innerHTML = '';
+        }
+
+        async function generateNewEmail() {
+            clearError();
+            document.getElementById('emailDisplay').textContent = 'Chargement...';
+            
+            try {
+                const res = await fetch(`${API_BASE}?f=get_email_address&lang=fr`);
+                if (!res.ok) throw new Error('API injoignable');
+                const data = await res.json();
+                
+                currentEmail = data.email_addr;
+                currentSidToken = data.sid_token;
+
+                document.getElementById('emailDisplay').textContent = currentEmail;
+                document.getElementById('emailList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <p>Aucun message pour le moment.</p>
+                        <p style="font-size:0.9em;margin-top:10px;">Les messages apparaîtront automatiquement.</p>
+                    </div>`;
+                showToast('✅ Nouvelle adresse créée !');
+            } catch (error) {
+                console.error('Erreur:', error);
+                document.getElementById('emailDisplay').textContent = 'Erreur réseau';
+                showError('Impossible de générer l\'email : ' + error.message);
+            }
+        }
+
+        function copyEmail() {
+            if (!currentEmail) return;
+            navigator.clipboard.writeText(currentEmail).then(() => showToast('✅ Adresse copiée !')).catch(() => {
+                const ta = document.createElement('textarea');
+                ta.value = currentEmail;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('✅ Adresse copiée !');
+            });
+        }
+
+        async function loadMessages() {
+            if (!currentSidToken) return;
+            try {
+                const res = await fetch(`${API_BASE}?f=check_email&seq=0&sid_token=${currentSidToken}`);
+                if (!res.ok) return;
+                const data = await res.json();
+                renderMessages(data.list || []);
+            } catch (error) {
+                console.error('Erreur chargement:', error);
+            }
+        }
+
+        function renderMessages(messages) {
+            const list = document.getElementById('emailList');
+            if (!messages || messages.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="icon">📭</div>
+                        <p>Aucun message pour le moment.</p>
+                    </div>`;
+                return;
+            }
+            list.innerHTML = messages.map(msg => `
+                <div class="email-item" onclick="openMessage('${msg.mail_id}')">
+                    <div class="email-from">De : ${escapeHtml(msg.mail_from)}</div>
+                    <div class="email-subject">${escapeHtml(msg.mail_subject || '(Sans sujet)')}</div>
+                    <div class="email-date">${escapeHtml(msg.mail_date)}</div>
+                </div>
+            `).join('');
+        }
+
+        async function openMessage(id) {
+            try {
+                const res = await fetch(`${API_BASE}?f=fetch_email&email_id=${id}&sid_token=${currentSidToken}`);
+                if (!res.ok) throw new Error('Erreur de lecture');
+                const msg = await res.json();
+
+                document.getElementById('modalSubject').textContent = msg.mail_subject || '(Sans sujet)';
+                document.getElementById('modalMeta').innerHTML = `
+                    <strong>De :</strong> ${escapeHtml(msg.mail_from)}<br>
+                    <strong>Date :</strong> ${escapeHtml(msg.mail_date)}
+                `;
+                // Guerilla Mail renvoie le corps en HTML
+                document.getElementById('modalBody').innerHTML = msg.mail_body || '<em>Message vide</em>';
+                document.getElementById('modal').classList.add('active');
+            } catch (error) {
+                console.error('Erreur:', error);
+                showToast('Erreur de lecture');
+            }
+        }
+
+        function closeModal() { document.getElementById('modal').classList.remove('active'); }
+        document.getElementById('modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(); });
+
+        function escapeHtml(text) { if (!text) return ''; const div = document.createElement('div'); div.textContent = text; return div.innerHTML; }
+        function showToast(message) { const toast = document.createElement('div'); toast.className = 'toast'; toast.textContent = message; document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
+    </script>
+</body>
+</html>
