@@ -3,7 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TempMailGo — Email Temporaire Gratuit</title>
+    <title>TempMailGo — Email Temporaire Gratuit, Sans Inscription</title>
+    <meta name="description" content="Créez une adresse e-mail temporaire gratuite en un clic, sans inscription. Recevez vos codes de vérification et vos liens de confirmation, puis jetez l'adresse.">
+    <meta name="robots" content="index, follow">
+    <meta name="theme-color" content="#667eea">
+    <link rel="canonical" href="https://jetable-brown.vercel.app/">
+    <meta property="og:title" content="TempMailGo — Email Temporaire Gratuit">
+    <meta property="og:description" content="Une adresse e-mail jetable en un clic, sans inscription. Recevez vos codes de vérification.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jetable-brown.vercel.app/">
+    <script type="application/ld+json">
+    {"@context":"https://schema.org","@graph":[
+      {"@type":"WebApplication","name":"TempMailGo","applicationCategory":"UtilitiesApplication","operatingSystem":"Web","inLanguage":"fr","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"description":"Générateur d'adresses e-mail temporaires gratuit, sans inscription."},
+      {"@type":"FAQPage","mainEntity":[
+        {"@type":"Question","name":"Qu'est-ce qu'une adresse e-mail temporaire ?","acceptedAnswer":{"@type":"Answer","text":"C'est une adresse jetable qui reçoit des messages pendant une courte durée, sans inscription. Elle sert à recevoir un code ou un lien de confirmation sans donner son adresse personnelle."}},
+        {"@type":"Question","name":"Est-ce que TempMailGo est gratuit ?","acceptedAnswer":{"@type":"Answer","text":"Oui. Le service est gratuit et ne demande ni inscription ni mot de passe."}},
+        {"@type":"Question","name":"Puis-je envoyer des e-mails avec cette adresse ?","acceptedAnswer":{"@type":"Answer","text":"Non. Le service reçoit uniquement des messages. Il ne permet pas d'en envoyer."}},
+        {"@type":"Question","name":"Mes messages sont-ils privés ?","acceptedAnswer":{"@type":"Answer","text":"Non. Quelqu'un qui connaît exactement la même adresse peut lire sa boîte. N'utilisez jamais ce service pour des comptes importants."}},
+        {"@type":"Question","name":"Combien de temps les messages sont-ils conservés ?","acceptedAnswer":{"@type":"Answer","text":"Les messages sont supprimés automatiquement par le service après un délai limité. Copiez ce dont vous avez besoin sans attendre."}}
+      ]}
+    ]}
+    </script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
         body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; color: #333; }
@@ -15,16 +35,31 @@
         .email-box { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .email-display { flex: 1; background: #f0f4ff; padding: 15px 20px; border-radius: 10px; font-size: 1.2em; font-weight: 600; color: #4a5568; border: 2px dashed #667eea; word-break: break-all; min-width: 250px; }
         .btn { padding: 15px 25px; border: none; border-radius: 10px; font-size: 1em; font-weight: 600; cursor: pointer; transition: all 0.3s; color: white; }
+        .btn:disabled { opacity: .6; cursor: wait; }
         .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); }
         .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(102,126,234,0.4); }
         .btn-secondary { background: #48bb78; }
         .btn-secondary:hover { background: #38a169; transform: translateY(-2px); }
+        .btn-danger { background: #e53e3e; }
+        .btn-light { background: #edf2f7; color: #2d3748; }
         .btn-small { padding: 8px 15px; font-size: 0.85em; }
+        .options { margin-top: 18px; padding-top: 18px; border-top: 1px solid #e2e8f0; }
+        .options summary { cursor: pointer; font-weight: 600; color: #5a67d8; }
+        .options-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; align-items: center; }
+        .options-row input, .options-row select { padding: 12px 14px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 1em; background: white; color: #2d3748; min-width: 0; }
+        .options-row input { flex: 1; min-width: 160px; }
+        .options-row input:focus, .options-row select:focus { outline: none; border-color: #667eea; }
+        .hint { font-size: 0.85em; color: #718096; margin-top: 10px; }
         .inbox-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
         .inbox-header h2 { color: #2d3748; }
+        .badge { display: inline-block; background: #e53e3e; color: white; border-radius: 20px; padding: 2px 10px; font-size: .8em; margin-left: 8px; vertical-align: middle; }
+        .badge[hidden] { display: none; }
+        .status { font-size: .85em; color: #718096; margin-bottom: 12px; }
         .email-list { display: flex; flex-direction: column; gap: 10px; }
         .email-item { padding: 15px; background: #f7fafc; border-radius: 10px; border-left: 4px solid #667eea; cursor: pointer; transition: all 0.2s; }
-        .email-item:hover { background: #edf2f7; transform: translateX(5px); }
+        .email-item:hover, .email-item:focus { background: #edf2f7; transform: translateX(5px); outline: none; }
+        .email-item.is-new { border-left-color: #48bb78; background: #f0fff4; }
+        .tag-new { background: #48bb78; color: white; border-radius: 6px; font-size: .72em; padding: 2px 8px; margin-left: 8px; font-weight: 700; }
         .email-from { font-weight: 600; color: #2d3748; margin-bottom: 5px; }
         .email-subject { color: #4a5568; margin-bottom: 5px; }
         .email-date { font-size: 0.85em; color: #a0aec0; }
@@ -32,18 +67,26 @@
         .empty-state .icon { font-size: 3em; margin-bottom: 10px; }
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; padding: 20px; }
         .modal.active { display: flex; }
-        .modal-content { background: white; border-radius: 15px; padding: 30px; max-width: 700px; width: 100%; max-height: 80vh; overflow-y: auto; }
+        .modal-content { background: white; border-radius: 15px; padding: 30px; max-width: 700px; width: 100%; max-height: 85vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 20px; gap: 15px; }
         .modal-header h3 { color: #2d3748; word-break: break-word; }
         .close-btn { background: #f56565; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; font-size: 1.2em; flex-shrink: 0; }
-        .modal-body { color: #4a5568; line-height: 1.6; word-break: break-word; }
+        .modal-body { color: #4a5568; line-height: 1.6; word-break: break-word; white-space: pre-wrap; }
+        .modal-body a { color: #5a67d8; }
         .modal-meta { font-size: 0.9em; color: #718096; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; }
+        .code-box { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; background: #f0fff4; border: 2px solid #9ae6b4; border-radius: 10px; padding: 12px 16px; margin-bottom: 15px; }
+        .code-box[hidden] { display: none; }
+        .code-box strong { font-size: 1.5em; letter-spacing: .08em; color: #22543d; }
+        .warn-link { font-size: .8em; color: #975a16; background: #fffaf0; border: 1px solid #fbd38d; border-radius: 8px; padding: 8px 12px; margin-top: 12px; }
+        .modal-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+        .html-frame { width: 100%; height: 420px; border: 1px solid #e2e8f0; border-radius: 10px; background: white; }
         .toast { position: fixed; bottom: 30px; right: 30px; background: #2d3748; color: white; padding: 15px 25px; border-radius: 10px; z-index: 2000; animation: slideIn 0.3s; max-width: 300px; }
         @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
         .loading { text-align: center; padding: 30px; color: #667eea; }
         .spinner { border: 3px solid #f0f4ff; border-top: 3px solid #667eea; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .error-box { background: #fed7d7; color: #c53030; padding: 15px; border-radius: 10px; margin-top: 10px; font-size: 0.9em; }
+        .notice { background: #fffaf0; border: 1px solid #fbd38d; color: #744210; border-radius: 10px; padding: 12px 16px; font-size: .9em; margin-bottom: 20px; }
 
         .ad-slot { background: rgba(255,255,255,0.96); border: 1px dashed #cbd5e0; border-radius: 12px; margin: 18px auto; padding: 12px; min-height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
         .ad-label { color: #718096; font-size: 0.72rem; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 8px; }
@@ -52,33 +95,28 @@
         .ad-slot iframe { max-width: 100%; }
         @media (max-width: 600px) { .ad-slot { min-height: 90px; padding: 8px; margin: 12px auto; } }
 
+        .content h2 { color: #2d3748; margin: 4px 0 10px; font-size: 1.35em; }
+        .content h3 { color: #2d3748; margin: 18px 0 6px; font-size: 1.05em; }
+        .content p, .content li { color: #4a5568; line-height: 1.7; }
+        .content ul, .content ol { padding-left: 22px; }
+        .content details { border-top: 1px solid #e2e8f0; padding: 12px 0; }
+        .content summary { cursor: pointer; font-weight: 600; color: #2d3748; }
+        .content details p { margin-top: 8px; }
+        .site-footer { text-align: center; color: white; font-size: .9em; margin: 14px auto 24px; line-height: 2; }
+        .site-footer a { color: white; text-decoration: underline; margin: 0 8px; }
         @media (max-width: 600px) { header h1 { font-size: 1.8em; } .email-display { font-size: 1em; padding: 12px; } .btn { padding: 12px 18px; } }
     </style>
 </head>
 <body>
 
     <!--
-      CONFIGURATION DES PUBLICITÉS — IMPORTANT
-      Trois emplacements sont prêts : #ad-slot-1, #ad-slot-2 et #ad-slot-3.
-      Ils sont volontairement inactifs tant que vous n'avez pas collé vos vrais codes.
-
-      GOOGLE ADSENSE :
-      1) Ajoutez UNE SEULE FOIS dans <head> le script officiel fourni par AdSense
-         (celui qui contient votre ca-pub-...).
-      2) Dans chaque emplacement choisi pour AdSense, remplacez le placeholder par
-         le bloc <ins class="adsbygoogle" ... data-ad-client="ca-pub-VOTRE_ID"
-         data-ad-slot="ID_DE_L_UNITE">...</ins> puis son script push officiel.
-      3) Utilisez l'ID d'unité publicitaire réel fourni dans votre compte.
-
-      ADSTERRA :
-      Collez le code complet de la zone bannière fourni par Adsterra dans l'emplacement
-      souhaité. Chaque zone peut avoir son propre code.
-
-      NE PAS MÉLANGER : dans un emplacement donné, utiliser AdSense OU Adsterra,
-      jamais les deux ensemble. Vous pouvez affecter des emplacements différents aux
-      deux réseaux seulement si leurs conditions et vos autorisations le permettent.
-      Ne cliquez jamais sur vos propres annonces et ne demandez pas aux visiteurs
-      de cliquer sur les annonces.
+      PUBLICITÉS — Trois emplacements prêts : #ad-slot-1, #ad-slot-2 et #ad-slot-3.
+      Ils restent inactifs tant que vous n'avez pas collé vos vrais codes.
+      ADSENSE : ajoutez UNE SEULE FOIS le script officiel dans <head>, puis collez le bloc
+      <ins class="adsbygoogle" ...> dans l'emplacement voulu.
+      ADSTERRA : collez le code complet de la zone dans l'emplacement voulu.
+      Dans un même emplacement, utilisez AdSense OU Adsterra, jamais les deux.
+      Ne cliquez jamais sur vos propres annonces et ne demandez pas aux visiteurs de cliquer.
     -->
     <div class="container">
         <header>
@@ -86,34 +124,35 @@
             <p>Générateur d'adresses email temporaires</p>
         </header>
 
-        <!-- EMPLACEMENT PUBLICITAIRE 1 — HAUT DE PAGE
-             Choisir UN SEUL réseau pour cet emplacement.
-             AdSense : coller ici le bloc <ins class="adsbygoogle"> avec votre data-ad-slot.
-             Adsterra : coller ici le code complet de la bannière/zone fourni dans votre compte.
-             Ne collez jamais les deux codes dans le même emplacement.
-             Les codes réels ne sont pas inclus : remplacez le placeholder ci-dessous.
-        -->
+        <!-- EMPLACEMENT PUBLICITAIRE 1 — HAUT DE PAGE (AdSense OU Adsterra) -->
         <section class="ad-slot" id="ad-slot-1" aria-label="Espace publicitaire">
             <div class="ad-label">Publicité</div>
             <div class="ad-placeholder">Emplacement publicitaire 1 — ajoutez ici le code AdSense OU Adsterra.</div>
         </section>
 
-        <div class="card">
-            <div class="email-box">
-                <div class="email-display" id="emailDisplay">Chargement...</div>
-                <button class="btn btn-primary" onclick="copyEmail()">📋 Copier</button>
-                <button class="btn btn-secondary" onclick="generateNewEmail()">🔄 Nouveau</button>
-            </div>
-            <div id="errorMsg"></div>
+        <div class="notice" role="note">
+            <strong>À savoir :</strong> cette boîte est <strong>publique</strong>. Toute personne qui connaît l'adresse exacte peut lire ses messages. N'utilisez jamais une adresse jetable pour une banque, un service de santé ou un compte important.
         </div>
 
-        <!-- EMPLACEMENT PUBLICITAIRE 2 — ENTRE ADRESSE ET BOÎTE DE RÉCEPTION
-             Choisir UN SEUL réseau pour cet emplacement.
-             AdSense : coller ici le bloc <ins class="adsbygoogle"> avec votre data-ad-slot.
-             Adsterra : coller ici le code complet de la bannière/zone fourni dans votre compte.
-             Ne collez jamais les deux codes dans le même emplacement.
-             Les codes réels ne sont pas inclus : remplacez le placeholder ci-dessous.
-        -->
+        <div class="card">
+            <div class="email-box">
+                <div class="email-display" id="emailDisplay" aria-live="polite">Chargement...</div>
+                <button class="btn btn-primary" type="button" onclick="copyEmail()">📋 Copier</button>
+                <button class="btn btn-secondary" type="button" id="newBtn" onclick="generateNewEmail()">🔄 Nouveau</button>
+            </div>
+            <details class="options">
+                <summary>Choisir mon nom et mon domaine</summary>
+                <div class="options-row">
+                    <input id="customName" type="text" maxlength="64" placeholder="mon-nom" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Nom de l'adresse">
+                    <select id="domainSelect" aria-label="Domaine"></select>
+                    <button class="btn btn-primary btn-small" type="button" onclick="useCustomEmail()">Utiliser</button>
+                </div>
+                <p class="hint">Lettres minuscules, chiffres, point, tiret et tiret bas (64 caractères au maximum). Un nom simple peut être deviné : préférez un nom aléatoire avec « Nouveau ».</p>
+            </details>
+            <div id="errorMsg" aria-live="assertive"></div>
+        </div>
+
+        <!-- EMPLACEMENT PUBLICITAIRE 2 — ENTRE ADRESSE ET BOÎTE DE RÉCEPTION (AdSense OU Adsterra) -->
         <section class="ad-slot" id="ad-slot-2" aria-label="Espace publicitaire">
             <div class="ad-label">Publicité</div>
             <div class="ad-placeholder">Emplacement publicitaire 2 — ajoutez ici le code AdSense OU Adsterra.</div>
@@ -121,10 +160,11 @@
 
         <div class="card">
             <div class="inbox-header">
-                <h2>📥 Boîte de réception</h2>
-                <button class="btn btn-primary btn-small" onclick="loadMessages()">🔄 Actualiser</button>
+                <h2>📥 Boîte de réception <span class="badge" id="unreadBadge" hidden>0</span></h2>
+                <button class="btn btn-primary btn-small" type="button" id="refreshBtn" onclick="loadMessages(true)">🔄 Actualiser</button>
             </div>
-            <div id="emailList" class="email-list">
+            <div class="status" id="statusLine" aria-live="polite">Actualisation automatique toutes les 8 secondes.</div>
+            <div id="emailList" class="email-list" aria-live="polite">
                 <div class="loading">
                     <div class="spinner"></div>
                     <p>Chargement des messages...</p>
@@ -132,164 +172,281 @@
             </div>
         </div>
 
-        <!-- EMPLACEMENT PUBLICITAIRE 3 — BAS DE PAGE
-             Choisir UN SEUL réseau pour cet emplacement.
-             AdSense : coller ici le bloc <ins class="adsbygoogle"> avec votre data-ad-slot.
-             Adsterra : coller ici le code complet de la bannière/zone fourni dans votre compte.
-             Ne collez jamais les deux codes dans le même emplacement.
-             Les codes réels ne sont pas inclus : remplacez le placeholder ci-dessous.
-        -->
+        <!-- EMPLACEMENT PUBLICITAIRE 3 — BAS DE PAGE (AdSense OU Adsterra) -->
         <section class="ad-slot" id="ad-slot-3" aria-label="Espace publicitaire">
             <div class="ad-label">Publicité</div>
             <div class="ad-placeholder">Emplacement publicitaire 3 — ajoutez ici le code AdSense OU Adsterra.</div>
         </section>
 
-    </div>
-    <p style="text-align:center;color:white;font-size:0.9em;margin:10px auto 20px;">Service de messagerie fourni par <a href="https://fmail.men/" target="_blank" rel="noopener noreferrer" style="color:white;text-decoration:underline;">fmail.men</a>.</p>
+        <main class="card content">
+            <h2>Email temporaire gratuit, sans inscription</h2>
+            <p>TempMailGo vous donne en un clic une adresse e-mail jetable. Utilisez-la pour recevoir un code de vérification, un lien de confirmation ou un fichier à télécharger, sans donner votre vraie adresse. Les nouveaux messages apparaissent tout seuls dans la boîte de réception, et vous pouvez fermer la page quand vous avez terminé.</p>
 
-    <div class="modal" id="modal">
+            <h3>Comment ça marche</h3>
+            <ol>
+                <li><strong>Copiez l'adresse</strong> affichée en haut de la page, ou choisissez votre propre nom.</li>
+                <li><strong>Utilisez-la</strong> sur le site qui demande une adresse e-mail.</li>
+                <li><strong>Lisez le message</strong> dès qu'il arrive. Si un code est détecté, vous pouvez le copier en un clic.</li>
+                <li><strong>Fermez la page</strong> : l'adresse n'a plus besoin d'être surveillée.</li>
+            </ol>
+
+            <h3>À quoi sert une adresse e-mail temporaire ?</h3>
+            <ul>
+                <li>Recevoir un code de vérification ou un lien de confirmation.</li>
+                <li>Tester l'inscription à un service sans encombrer votre boîte principale.</li>
+                <li>Limiter le spam et les publicités reçues après une inscription.</li>
+                <li>Télécharger un document qui exige une adresse e-mail.</li>
+            </ul>
+
+            <h3>Bonnes pratiques et limites</h3>
+            <ul>
+                <li>La boîte est publique : n'utilisez pas ce service pour des comptes importants (banque, santé, administration).</li>
+                <li>Le service reçoit des messages mais ne permet pas d'en envoyer.</li>
+                <li>Les messages sont supprimés automatiquement après un délai limité : copiez ce dont vous avez besoin.</li>
+                <li>Certains sites refusent les adresses jetables. Dans ce cas, essayez un autre domaine.</li>
+                <li>Les pièces jointes ne sont pas affichées.</li>
+            </ul>
+
+            <h3>Questions fréquentes</h3>
+            <details><summary>Qu'est-ce qu'une adresse e-mail temporaire ?</summary><p>C'est une adresse jetable qui reçoit des messages pendant une courte durée, sans inscription. Elle sert à recevoir un code ou un lien de confirmation sans donner son adresse personnelle.</p></details>
+            <details><summary>Est-ce que TempMailGo est gratuit ?</summary><p>Oui. Le service est gratuit et ne demande ni inscription ni mot de passe.</p></details>
+            <details><summary>Puis-je envoyer des e-mails avec cette adresse ?</summary><p>Non. Le service reçoit uniquement des messages. Il ne permet pas d'en envoyer.</p></details>
+            <details><summary>Mes messages sont-ils privés ?</summary><p>Non. Quelqu'un qui connaît exactement la même adresse peut lire sa boîte. N'utilisez jamais ce service pour des comptes importants.</p></details>
+            <details><summary>Combien de temps les messages sont-ils conservés ?</summary><p>Ils sont supprimés automatiquement par le service après un délai limité. Copiez ce dont vous avez besoin sans attendre.</p></details>
+        </main>
+
+    </div>
+
+    <p class="site-footer">
+        <a href="/a-propos.html">À propos</a> · <a href="/contact.html">Contact</a> · <a href="/confidentialite.html">Confidentialité</a> · <a href="/conditions.html">Conditions d'utilisation</a><br>
+        Service de messagerie fourni par <a href="https://fmail.men/" target="_blank" rel="noopener noreferrer">fmail.men</a>.
+    </p>
+
+    <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalSubject">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 id="modalSubject"></h3>
-                <button class="close-btn" onclick="closeModal()">✕</button>
+                <button class="close-btn" type="button" id="modalClose" onclick="closeModal()" aria-label="Fermer">✕</button>
             </div>
             <div class="modal-meta" id="modalMeta"></div>
+            <div class="code-box" id="codeBox" hidden>
+                <span>Code détecté :</span> <strong id="codeValue"></strong>
+                <button class="btn btn-secondary btn-small" type="button" onclick="copyCode()">Copier le code</button>
+            </div>
             <div class="modal-body" id="modalBody"></div>
+            <div id="htmlWrap"></div>
+            <div class="warn-link" id="linkWarn" hidden>Vérifiez toujours l'adresse d'un lien avant de cliquer : n'importe qui peut envoyer un message à cette boîte.</div>
+            <div class="modal-actions">
+                <button class="btn btn-light btn-small" type="button" id="htmlBtn" onclick="toggleHtml()" hidden>Voir la version HTML sécurisée</button>
+                <button class="btn btn-danger btn-small" type="button" onclick="deleteCurrent()">🗑️ Supprimer</button>
+            </div>
         </div>
     </div>
 
     <script>
         // API publique fmail.men : compatible avec les appels depuis le navigateur (CORS).
         const API_BASE = 'https://fmail.men/v1';
+        const STORAGE_KEY = 'tempmailgo.address';
+        const POLL_MS = 8000;
+        const BASE_TITLE = document.title;
+        // Domaines à masquer dans la liste (laissez vide pour tout afficher) :
+        const HIDDEN_DOMAINS = [];
+
         let currentEmail = null;
-        let currentToken = null;
-        let refreshTimer = null;
+        let seen = new Set();
+        let newTokens = new Set();
+        let firstLoad = true;
         let isGenerating = false;
+        let isLoading = false;
+        let unread = 0;
+        let openToken = null;
+        let openHtml = '';
+        let openCode = '';
+        let lastFocus = null;
+        let defaultDomain = 'fmail.men';
 
-        window.addEventListener('DOMContentLoaded', async () => {
-            await generateNewEmail();
-            if (refreshTimer) clearInterval(refreshTimer);
-            refreshTimer = setInterval(() => {
-                if (currentEmail) loadMessages();
-            }, 15000);
-        });
+        const $ = (id) => document.getElementById(id);
 
-        async function apiRequest(path) {
+        function storageGet() { try { return localStorage.getItem(STORAGE_KEY); } catch (_) { return null; } }
+        function storageSet(v) { try { localStorage.setItem(STORAGE_KEY, v); } catch (_) {} }
+
+        function isValidAddress(addr) {
+            return typeof addr === 'string' && /^[a-z0-9._-]{1,64}@[a-z0-9.-]{3,100}$/.test(addr);
+        }
+
+        function findCode(text) {
+            if (!text) return '';
+            const found = String(text).match(/\b\d{3}[ -]\d{3}\b|\b\d{4,8}\b/g);
+            if (!found) return '';
+            const cleaned = found.map(c => c.replace(/\D/g, ''));
+            return cleaned.find(c => c.length === 6) || cleaned[0] || '';
+        }
+
+        function appendLinkified(container, text) {
+            container.textContent = '';
+            const re = /(https?:\/\/[^\s<>"']+)/g;
+            let last = 0, m;
+            while ((m = re.exec(text)) !== null) {
+                let url = m[1], trail = '';
+                const t = url.match(/[.,;:!?)\]]+$/);
+                if (t) { trail = t[0]; url = url.slice(0, url.length - trail.length); }
+                container.appendChild(document.createTextNode(text.slice(last, m.index)));
+                let safe = false;
+                try { const u = new URL(url); safe = (u.protocol === 'https:' || u.protocol === 'http:'); } catch (_) {}
+                if (safe) {
+                    const a = document.createElement('a');
+                    a.href = url; a.textContent = url; a.target = '_blank'; a.rel = 'noopener noreferrer nofollow';
+                    container.appendChild(a);
+                } else { container.appendChild(document.createTextNode(url)); }
+                if (trail) container.appendChild(document.createTextNode(trail));
+                last = m.index + m[0].length;
+            }
+            container.appendChild(document.createTextNode(text.slice(last)));
+            return text.indexOf('http') !== -1;
+        }
+
+        function stripHtml(html) {
+            return String(html).replace(/<style[\s\S]*?<\/style>/gi, '').replace(/<script[\s\S]*?<\/script>/gi, '')
+                .replace(/<br\s*\/?>/gi, '\n').replace(/<\/(p|div|tr|li|h[1-6])>/gi, '\n').replace(/<[^>]+>/g, ' ')
+                .replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&lt;/gi, '<').replace(/&gt;/gi, '>')
+                .replace(/&quot;/gi, '"').replace(/&#39;/gi, "'").replace(/[ \t]+/g, ' ').replace(/\n\s*\n\s*\n+/g, '\n\n').trim();
+        }
+
+        async function apiRequest(path, method) {
             let response;
             try {
-                response = await fetch(`${API_BASE}${path}`, {
-                    headers: { 'Accept': 'application/json' },
-                    cache: 'no-store'
-                });
+                response = await fetch(`${API_BASE}${path}`, { method: method || 'GET', headers: { 'Accept': 'application/json' }, cache: 'no-store' });
             } catch (e) {
                 throw new Error('Connexion au serveur impossible. Vérifiez Internet puis réessayez.');
             }
             let data = {};
             try { data = await response.json(); } catch (_) {}
-            if (!response.ok) {
-                throw new Error(data?.error?.message || `Erreur du service (HTTP ${response.status}).`);
-            }
+            if (!response.ok) throw new Error((data && data.error && data.error.message) || `Erreur du service (HTTP ${response.status}).`);
             return data;
         }
 
         function showError(msg) {
-            const box = document.getElementById('errorMsg');
-            box.textContent = '';
-            const error = document.createElement('div');
-            error.className = 'error-box';
-            error.textContent = `⚠️ ${msg}`;
+            const box = $('errorMsg'); box.textContent = '';
+            const error = document.createElement('div'); error.className = 'error-box'; error.textContent = `⚠️ ${msg}`;
             box.appendChild(error);
         }
+        function clearError() { $('errorMsg').textContent = ''; }
 
-        function clearError() {
-            document.getElementById('errorMsg').textContent = '';
+        function setUnread(n) {
+            unread = Math.max(0, n);
+            $('unreadBadge').textContent = unread; $('unreadBadge').hidden = unread === 0;
+            document.title = unread > 0 ? `(${unread}) ${BASE_TITLE}` : BASE_TITLE;
+        }
+
+        function resetMailboxState() { seen = new Set(); newTokens = new Set(); firstLoad = true; setUnread(0); }
+
+        async function loadDomains() {
+            let list = [defaultDomain];
+            try {
+                const data = await apiRequest('/domains');
+                if (Array.isArray(data.domains) && data.domains.length) list = data.domains.filter(d => HIDDEN_DOMAINS.indexOf(d) === -1);
+                if (data.default) defaultDomain = data.default;
+            } catch (_) {}
+            if (list.indexOf(defaultDomain) === -1) list.unshift(defaultDomain);
+            const sel = $('domainSelect'); sel.textContent = '';
+            list.forEach(d => { const o = document.createElement('option'); o.value = d; o.textContent = '@' + d; sel.appendChild(o); });
+            sel.value = defaultDomain;
+        }
+
+        function applyAddress(address) {
+            currentEmail = address; storageSet(address); resetMailboxState();
+            $('emailDisplay').textContent = address;
+            $('emailList').innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>Aucun message pour le moment.</p><p style="font-size:0.9em;margin-top:10px;">Les nouveaux messages seront vérifiés automatiquement.</p></div>`;
         }
 
         async function generateNewEmail() {
             if (isGenerating) return;
-            isGenerating = true;
-            clearError();
-            currentEmail = null;
-            currentToken = null;
-            document.getElementById('emailDisplay').textContent = 'Création de l’adresse…';
-            document.getElementById('emailList').innerHTML = `
-                <div class="loading"><div class="spinner"></div><p>Connexion au service de messagerie…</p></div>`;
+            isGenerating = true; $('newBtn').disabled = true; clearError();
+            $('emailDisplay').textContent = 'Création de l’adresse…';
             try {
-                const box = await apiRequest('/random');
-                if (!box.address || !box.username || !box.domain) {
-                    throw new Error('Le service n’a pas renvoyé une adresse valide. Réessayez.');
-                }
-                currentEmail = box.address;
-                currentToken = 'ready';
-                document.getElementById('emailDisplay').textContent = currentEmail;
-                document.getElementById('emailList').innerHTML = `
-                    <div class="empty-state"><div class="icon">📭</div><p>Aucun message pour le moment.</p>
-                    <p style="font-size:0.9em;margin-top:10px;">Les nouveaux messages seront vérifiés automatiquement.</p></div>`;
+                const domain = $('domainSelect').value || defaultDomain;
+                const box = await apiRequest(`/random?domain=${encodeURIComponent(domain)}`);
+                if (!box.address || !isValidAddress(box.address)) throw new Error('Le service n’a pas renvoyé une adresse valide. Réessayez.');
+                applyAddress(box.address);
                 showToast('✅ Nouvelle adresse créée !');
-                await loadMessages();
+                await loadMessages(false);
             } catch (error) {
                 console.error('Erreur de création de boîte :', error);
-                document.getElementById('emailDisplay').textContent = 'Erreur de connexion';
-                document.getElementById('emailList').innerHTML = `
-                    <div class="empty-state"><div class="icon">⚠️</div><p>Impossible de charger la boîte de réception.</p>
-                    <p style="font-size:0.9em;margin-top:10px;">Cliquez sur « Nouveau » pour réessayer.</p></div>`;
+                currentEmail = null;
+                $('emailDisplay').textContent = 'Erreur de connexion';
+                $('emailList').innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>Impossible de charger la boîte de réception.</p><p style="font-size:0.9em;margin-top:10px;">Cliquez sur « Nouveau » pour réessayer.</p></div>`;
                 showError(error.message || 'Impossible de joindre le service de messagerie.');
-            } finally {
-                isGenerating = false;
+            } finally { isGenerating = false; $('newBtn').disabled = false; }
+        }
+
+        async function useCustomEmail() {
+            const name = $('customName').value.trim().toLowerCase();
+            const domain = $('domainSelect').value || defaultDomain;
+            if (!/^[a-z0-9._-]{1,64}$/.test(name)) {
+                showError('Le nom doit contenir 1 à 64 caractères : lettres minuscules, chiffres, point, tiret ou tiret bas.');
+                return;
             }
+            clearError();
+            applyAddress(`${name}@${domain}`);
+            showToast('✅ Adresse activée !');
+            await loadMessages(false);
         }
 
         async function copyEmail() {
             if (!currentEmail) { showToast('Créez d’abord une adresse e-mail.'); return; }
-            try {
-                await navigator.clipboard.writeText(currentEmail);
-                showToast('✅ Adresse copiée !');
-            } catch (_) {
-                const ta = document.createElement('textarea');
-                ta.value = currentEmail;
-                ta.setAttribute('readonly', '');
-                ta.style.position = 'fixed'; ta.style.opacity = '0';
-                document.body.appendChild(ta); ta.select();
-                const copied = document.execCommand('copy'); ta.remove();
-                showToast(copied ? '✅ Adresse copiée !' : 'Copie impossible dans ce navigateur.');
+            await copyText(currentEmail, '✅ Adresse copiée !');
+        }
+        async function copyCode() { if (openCode) await copyText(openCode, '✅ Code copié !'); }
+
+        async function copyText(text, okMessage) {
+            try { await navigator.clipboard.writeText(text); showToast(okMessage); }
+            catch (_) {
+                const ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', '');
+                ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+                let copied = false; try { copied = document.execCommand('copy'); } catch (_) {}
+                ta.remove(); showToast(copied ? okMessage : 'Copie impossible dans ce navigateur.');
             }
         }
 
-        async function loadMessages() {
-            const list = document.getElementById('emailList');
-            if (!currentEmail) return;
-            const parts = currentEmail.split('@');
-            if (parts.length !== 2) return;
+        async function loadMessages(manual) {
+            if (!currentEmail || isLoading) return;
+            const parts = currentEmail.split('@'); if (parts.length !== 2) return;
+            isLoading = true;
+            if (manual) $('refreshBtn').disabled = true;
+            const requested = currentEmail;
             try {
                 const data = await apiRequest(`/inbox/${encodeURIComponent(parts[0])}?domain=${encodeURIComponent(parts[1])}&limit=50`);
-                renderMessages(data.emails || []);
+                if (requested !== currentEmail) return;
+                const messages = Array.isArray(data.emails) ? data.emails : [];
+                let added = 0;
+                messages.forEach(m => { if (m.token && !seen.has(m.token)) { seen.add(m.token); if (!firstLoad) { added++; newTokens.add(m.token); } } });
+                if (firstLoad) { firstLoad = false; }
+                else if (added > 0) { setUnread(unread + added); showToast(added === 1 ? '📩 Nouveau message reçu !' : `📩 ${added} nouveaux messages !`); }
+                renderMessages(messages);
                 clearError();
+                $('statusLine').textContent = `Dernière actualisation : ${new Date().toLocaleTimeString('fr-FR')} · automatique toutes les ${POLL_MS / 1000} secondes.`;
             } catch (error) {
                 console.error('Erreur de chargement des messages :', error);
-                showError(error.message || 'La boîte n’a pas pu être actualisée.');
-                if (!list.querySelector('.email-item')) {
-                    list.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><p>La boîte n’a pas pu être actualisée.</p>
-                    <p style="font-size:0.9em;margin-top:10px;">Réessayez dans quelques instants.</p></div>`;
-                }
-            }
+                if (manual) showError(error.message || 'La boîte n’a pas pu être actualisée.');
+                $('statusLine').textContent = 'Actualisation impossible pour le moment. Nouvelle tentative automatique…';
+            } finally { isLoading = false; $('refreshBtn').disabled = false; }
         }
 
         function renderMessages(messages) {
-            const list = document.getElementById('emailList');
-            if (!Array.isArray(messages) || messages.length === 0) {
+            const list = $('emailList');
+            if (!messages.length) {
                 list.innerHTML = `<div class="empty-state"><div class="icon">📭</div><p>Aucun message pour le moment.</p></div>`;
                 return;
             }
-            list.innerHTML = '';
+            list.textContent = '';
             messages.forEach(msg => {
                 const item = document.createElement('div');
-                item.className = 'email-item'; item.tabIndex = 0; item.setAttribute('role', 'button');
-                const from = document.createElement('div'); from.className = 'email-from';
-                from.textContent = `De : ${msg.sender || 'Inconnu'}`;
-                const subject = document.createElement('div'); subject.className = 'email-subject';
-                subject.textContent = msg.subject || '(Sans sujet)';
-                const date = document.createElement('div'); date.className = 'email-date';
-                date.textContent = formatDate(msg.received_at);
+                const isNew = !!msg.token && newTokens.has(msg.token);
+                item.className = 'email-item' + (isNew ? ' is-new' : ''); item.tabIndex = 0; item.setAttribute('role', 'button');
+                const from = document.createElement('div'); from.className = 'email-from'; from.textContent = `De : ${msg.sender || 'Inconnu'}`;
+                if (isNew) { const tag = document.createElement('span'); tag.className = 'tag-new'; tag.textContent = 'NOUVEAU'; from.appendChild(tag); }
+                const subject = document.createElement('div'); subject.className = 'email-subject'; subject.textContent = msg.subject || '(Sans sujet)';
+                const date = document.createElement('div'); date.className = 'email-date'; date.textContent = formatDate(msg.received_at);
                 item.append(from, subject, date);
                 item.addEventListener('click', () => openMessage(msg.token));
                 item.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMessage(msg.token); } });
@@ -302,11 +459,9 @@
             if (typeof from === 'string') return from;
             return from.name ? `${from.name} <${from.address || ''}>` : (from.address || 'Inconnu');
         }
-
         function formatDate(value) {
             if (!value) return 'Date inconnue';
-            // fmail.men renvoie la date en millisecondes Unix.
-            const date = new Date(typeof value === 'number' ? value : value);
+            const date = new Date(value);
             return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString('fr-FR');
         }
 
@@ -314,45 +469,72 @@
             if (!currentEmail || !token) return;
             try {
                 const msg = await apiRequest(`/email/${encodeURIComponent(token)}`);
-                document.getElementById('modalSubject').textContent = msg.subject || '(Sans sujet)';
-                document.getElementById('modalMeta').textContent = `De : ${formatSender(msg.sender)} · Date : ${formatDate(msg.received_at)}`;
-                const body = document.getElementById('modalBody');
-                let content = msg.body_text || '';
-                if (!content && msg.body_html) {
-                    content = String(msg.body_html).replace(/<style[\s\S]*?<\/style>/gi, '')
-                        .replace(/<script[\s\S]*?<\/script>/gi, '').replace(/<[^>]+>/g, ' ')
-                        .replace(/&nbsp;/gi, ' ').replace(/&amp;/gi, '&').replace(/&lt;/gi, '<')
-                        .replace(/&gt;/gi, '>').replace(/&quot;/gi, '"').replace(/&#39;/gi, "'");
-                }
-                body.style.whiteSpace = 'pre-wrap'; body.textContent = content || '(Message vide)';
-                document.getElementById('modal').classList.add('active');
+                openToken = token; openHtml = msg.body_html ? String(msg.body_html) : '';
+                if (newTokens.has(token)) { newTokens.delete(token); setUnread(unread - 1); }
+                $('modalSubject').textContent = msg.subject || '(Sans sujet)';
+                $('modalMeta').textContent = `De : ${formatSender(msg.sender)} · Date : ${formatDate(msg.received_at)}`;
+                const text = (msg.body_text && String(msg.body_text).trim()) ? String(msg.body_text) : (openHtml ? stripHtml(openHtml) : '');
+                const hasLink = appendLinkified($('modalBody'), text || '(Message vide)');
+                $('linkWarn').hidden = !hasLink;
+                openCode = findCode(msg.subject) || findCode(text);
+                $('codeValue').textContent = openCode; $('codeBox').hidden = !openCode;
+                $('htmlWrap').textContent = ''; $('modalBody').hidden = false;
+                $('htmlBtn').hidden = !openHtml; $('htmlBtn').textContent = 'Voir la version HTML sécurisée';
+                lastFocus = document.activeElement;
+                $('modal').classList.add('active'); $('modalClose').focus();
+                document.querySelectorAll('.email-item.is-new').forEach(i => { if (unread === 0) i.classList.remove('is-new'); });
             } catch (error) {
                 console.error('Erreur de lecture :', error);
                 showToast(error.message || 'Impossible d’ouvrir ce message.');
             }
         }
 
-        function closeModal() {
-            document.getElementById('modal').classList.remove('active');
+        function toggleHtml() {
+            const wrap = $('htmlWrap');
+            if (wrap.firstChild) { wrap.textContent = ''; $('modalBody').hidden = false; $('htmlBtn').textContent = 'Voir la version HTML sécurisée'; return; }
+            const frame = document.createElement('iframe');
+            frame.className = 'html-frame';
+            frame.setAttribute('sandbox', 'allow-popups allow-popups-to-escape-sandbox');
+            frame.setAttribute('referrerpolicy', 'no-referrer');
+            frame.setAttribute('title', 'Contenu HTML du message');
+            frame.srcdoc = '<!doctype html><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; img-src data:"><base target="_blank">' + openHtml;
+            wrap.appendChild(frame); $('modalBody').hidden = true; $('htmlBtn').textContent = 'Voir la version texte';
+            $('linkWarn').hidden = false;
         }
 
-        document.getElementById('modal').addEventListener('click', e => {
-            if (e.target.id === 'modal') closeModal();
-        });
+        async function deleteCurrent() {
+            if (!openToken) return;
+            const token = openToken;
+            try {
+                await apiRequest(`/email/${encodeURIComponent(token)}`, 'DELETE');
+                seen.delete(token); closeModal(); showToast('🗑️ Message supprimé.');
+                await loadMessages(false);
+            } catch (error) { showToast(error.message || 'Suppression impossible.'); }
+        }
 
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closeModal();
-        });
+        function closeModal() {
+            $('modal').classList.remove('active'); $('htmlWrap').textContent = ''; openToken = null;
+            if (lastFocus && lastFocus.focus) lastFocus.focus();
+        }
+
+        $('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+        $('customName').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); useCustomEmail(); } });
 
         function showToast(message) {
-            const previous = document.querySelector('.toast');
-            if (previous) previous.remove();
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(() => toast.remove(), 3000);
+            const previous = document.querySelector('.toast'); if (previous) previous.remove();
+            const toast = document.createElement('div'); toast.className = 'toast'; toast.setAttribute('role', 'status'); toast.textContent = message;
+            document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000);
         }
+
+        window.addEventListener('DOMContentLoaded', async () => {
+            await loadDomains();
+            const saved = storageGet();
+            if (isValidAddress(saved)) { applyAddress(saved); await loadMessages(false); }
+            else { await generateNewEmail(); }
+            setInterval(() => { if (currentEmail && !document.hidden) loadMessages(false); }, POLL_MS);
+            document.addEventListener('visibilitychange', () => { if (!document.hidden && currentEmail) loadMessages(false); });
+        });
     </script>
 </body>
 </html>
